@@ -23,7 +23,7 @@ int main( void )
         printf( "Popped: %d, ", AS_Pop(Stack) );
         
         if ( ! AS_IsEmpty(Stack) )
-            printf( "Current Top: %d\n", AS_Top(Stack) );
+            printf( "Current Top: %d, Capacity: %d, Size: %d\n", AS_Top(Stack), Stack->Capacity, AS_GetSize(Stack));
         else
             printf( "Stack Is Empty.\n" );
     }
@@ -31,6 +31,7 @@ int main( void )
     for (int j = 0; j < 10; j++ )
     {
         AS_Push(Stack, j*3);
+        printf( "\nCurrent Top: %d, Capacity: %d, Size: %d\n", AS_Top(Stack), Stack->Capacity, AS_GetSize(Stack));
     }
 
     if (AS_IsFull(Stack))
@@ -44,7 +45,7 @@ int main( void )
         printf( "Popped: %d, ", AS_Pop(Stack) );
         
         if ( ! AS_IsEmpty(Stack) )
-            printf( "Current Top: %d\n", AS_Top(Stack) );
+            printf( "Current Top: %d, Capacity: %d, Size: %d\n", AS_Top(Stack), Stack->Capacity, AS_GetSize(Stack));
         else
             printf( "Stack Is Empty.\n" );
     }

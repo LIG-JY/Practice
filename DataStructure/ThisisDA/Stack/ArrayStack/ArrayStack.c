@@ -25,14 +25,70 @@ void AS_DestroyStack(ArrayStack* Stack)
 
 void AS_Push(ArrayStack* Stack, ElementType Data)
 {
-    Stack->Top++;
-    Stack->Nodes[Stack->Top].Data = Data;
+    if (AS_IsFull(Stack)) // Stack이 Full 이라면 용량 3개 증가
+    {
+        // 기존의 값들 새로운 Node의 배열(Stack)에 복사
+        Node* NewNodes = (Node*)malloc(sizeof(Node)*(Stack->Capacity + 3));
+        for (int i = 0; i < Stack->Capacity; i++)
+        {
+            NewNodes[i].Data = Stack->Nodes[i].Data;
+        }
+
+        // 새로운 값 Stack에 추가
+        Stack->Top++;
+        NewNodes[Stack->Top].Data = Data;
+        
+        // 기존의 Nodes의 배열 삭제
+        free(Stack->Nodes);
+
+        // 새로운 Nodes의 배열 연결
+        Stack->Nodes = NewNodes;
+
+        // Capacity 갱신
+        Stack->Capacity += 3;
+
+        // debug
+        printf("\n Capacity has increased! before: %d after : %d\n", Stack->Capacity - 3, Stack->Capacity);
+    }
+    else
+    {
+        Stack->Top++;
+        Stack->Nodes[Stack->Top].Data = Data;
+    }
 }
 
 ElementType AS_Pop(ArrayStack* Stack)
 {
+    if (Stack->Top < 0)
+    {
+        printf("\nthis Stack does not have node\n");
+    }
+
     int Position = Stack->Top--;
-    return Stack->Nodes[Position].Data;
+    ElementType popped = Stack->Nodes[Position].Data;
+
+    if (Position < (Stack->Capacity - 2))
+    {
+        // 기존의 값들 새로운 Node의 배열(Stack)에 복사
+        Node* NewNodes = (Node*)malloc(sizeof(Node)*(Stack->Capacity - 3));
+        for (int i = Stack->Top; i > -1; i--)
+        {
+            NewNodes[i].Data = Stack->Nodes[i].Data;
+        }
+
+        // 기존 Stack free
+        free(Stack->Nodes);
+
+        // 새로운 Stack 연결
+        Stack->Nodes = NewNodes;
+
+        // Capacity 갱신
+        Stack->Capacity -= 3;
+
+        // debug
+        printf("\n Capacity has decreased! before: %d after : %d\n", Stack->Capacity + 3, Stack->Capacity);
+    }
+    return popped;
 }
 
 // 최상위 노드의 데이터를 제거하지 않고 반환(보여주기)
