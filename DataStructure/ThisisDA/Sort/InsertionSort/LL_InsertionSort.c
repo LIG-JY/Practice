@@ -101,45 +101,68 @@ void DDL_PrintData(Node* head)
 {
 	while (head != NULL)
 	{
-		printf("data is %d\n", head->Data);
+		printf("Node%p, data is %d\n",head, head->Data);
 		head = head->NextNode;
 	}
 }
 
-void InsertionSort(Node* head) 
+void InsertionSort(Node* head, int length) 
 {  
-    int j = 0;
 	Node* temp = NULL;
 	Node* target = NULL;
-    Node* key = NULL; 
+    Node* key = NULL;
+	int i = 0;
+	int j = 0;
  
     /* 
 	Node 탐색과정, value(key)를 정하는 과정, head 바로 다음(배열이라면 index 1)부터 시작 
 	*/
 	temp = head->NextNode;
-    while(temp != NULL)
+    for (i = 1; i < length; i++)
     {
         /* value가 정렬된 상태인지 확인 */
-		if ( temp->PrevNode->Data > temp->Data )
+		if ( (temp->PrevNode)->Data > temp->Data )
 		{
 			key = temp;
-
-        /* 
-			가장 앞 부터 비교(이미 정렬되어있다는 가정) 
-			노드 탐색 과정
-		*/
+			/* 
+				가장 앞 부터 비교(이미 정렬되어있다는 가정) 
+				노드 탐색 과정
+			*/
 			target = head;
 			while (1)
 			{
 				if (target->Data > key->Data)
 				{
-					DLL_InsertBefore(target, key);
+					/* key를 리스트로 부터 제거할 때 연결을 유지시키기 위한 코드 */
+					(key->PrevNode)->NextNode = key->NextNode;
+					if (key->NextNode != NULL)
+					{
+						(key->NextNode)->PrevNode = key->PrevNode;
+					}
+					/* 새로운 위치에서 연결 */
+					if (target->PrevNode != NULL)
+					{
+						(target->PrevNode)->NextNode = key;
+					}
+					key->PrevNode = target->PrevNode;
+					target->PrevNode = key;
+					key->NextNode = target;
 					break;
 				}
 				target = target->NextNode;
-			}	
+			}
 		}
-		temp = temp->NextNode;
+		/* 헤드 찾기 */
+		while (head->PrevNode != NULL)
+		{
+			head = head->PrevNode;
+		}
+		/* temp 위치 조정 */
+		temp = head->NextNode;
+		for (j = 1; j < i; j++)
+		{
+			temp = temp->NextNode;
+		}
     }
 }
  
@@ -163,8 +186,15 @@ int main( void )
 	printf("before--------------------------\n");
 	DDL_PrintData(Node1);
 	printf("after--------------------------\n");
-    InsertionSort(Node1);
+    InsertionSort(Node1, DLL_GetNodeCount(Node1));
 	DDL_PrintData(Node1);
+
+	DLL_DestroyNode(Node1);
+	DLL_DestroyNode(Node2);
+	DLL_DestroyNode(Node3);
+	DLL_DestroyNode(Node4);
+	DLL_DestroyNode(Node5);
+	DLL_DestroyNode(Node6);
+	
     return 0; 
 }
-
