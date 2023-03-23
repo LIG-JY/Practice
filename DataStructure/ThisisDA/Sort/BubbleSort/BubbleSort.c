@@ -31,7 +31,7 @@ void BubbleSort(int DataSet[], int Length)
         }
             
     } 
-} 
+}
  
 int main( void ) 
 { 
