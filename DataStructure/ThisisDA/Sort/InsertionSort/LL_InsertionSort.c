@@ -106,18 +106,19 @@ void DDL_PrintData(Node* head)
 	}
 }
 
-void InsertionSort(Node* head, int length) 
+Node* InsertionSort(Node** head, int length) 
 {  
 	Node* temp = NULL;
 	Node* target = NULL;
     Node* key = NULL;
+	Node* headptr = (*head);
 	int i = 0;
 	int j = 0;
  
     /* 
 	Node 탐색과정, value(key)를 정하는 과정, head 바로 다음(배열이라면 index 1)부터 시작 
 	*/
-	temp = head->NextNode;
+	temp = headptr->NextNode;
     for (i = 1; i < length; i++)
     {
         /* value가 정렬된 상태인지 확인 */
@@ -128,7 +129,7 @@ void InsertionSort(Node* head, int length)
 				가장 앞 부터 비교(이미 정렬되어있다는 가정) 
 				노드 탐색 과정
 			*/
-			target = head;
+			target = headptr;
 			while (1)
 			{
 				if (target->Data > key->Data)
@@ -150,20 +151,25 @@ void InsertionSort(Node* head, int length)
 					break;
 				}
 				target = target->NextNode;
+				// // debug
+				// printf("target : %p\n", target);
 			}
 		}
 		/* 헤드 찾기 */
-		while (head->PrevNode != NULL)
+		while (headptr->PrevNode != NULL)
 		{
-			head = head->PrevNode;
+			headptr = headptr->PrevNode;
 		}
+		// // debug
+		// printf("head : %p\n", headptr);
 		/* temp 위치 조정 */
-		temp = head->NextNode;
-		for (j = 1; j < i; j++)
+		temp = headptr;
+		for (j = 0; j < i + 1; j++)
 		{
 			temp = temp->NextNode;
 		}
     }
+	return headptr;
 }
  
 int main( void )
@@ -183,11 +189,14 @@ int main( void )
 	DLL_AppendNode(&Node1, Node5);
 	DLL_AppendNode(&Node1, Node6);
 
+	/* 헤드 설정 */
+	Node* head = Node1;
+
 	printf("before--------------------------\n");
-	DDL_PrintData(Node1);
+	DDL_PrintData(head);
 	printf("after--------------------------\n");
-    InsertionSort(Node1, DLL_GetNodeCount(Node1));
-	DDL_PrintData(Node1);
+    head = InsertionSort(&Node1, DLL_GetNodeCount(Node1));
+	DDL_PrintData(head);
 
 	DLL_DestroyNode(Node1);
 	DLL_DestroyNode(Node2);
@@ -195,6 +204,8 @@ int main( void )
 	DLL_DestroyNode(Node4);
 	DLL_DestroyNode(Node5);
 	DLL_DestroyNode(Node6);
-	
+
+	/* free 해서 segmentation fault*/
+	printf("\ncount is %d \n", DLL_GetNodeCount(head));
     return 0; 
 }
