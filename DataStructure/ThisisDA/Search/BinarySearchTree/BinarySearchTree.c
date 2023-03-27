@@ -23,7 +23,9 @@ void BST_DestroyTree( BSTNode* Tree )
     if ( Tree->Left != NULL )
         BST_DestroyTree( Tree->Left );
 
-    /* left, right child 중 둘 중하나만 있는 경우 child를 free하고 포인터 NULL로 만들어 준다. */
+    /* left, right child 중 둘 중하나만 있는 경우 생각 해보기
+     1. child를 free하고 2. child를 가리키는 포인터 NULL로 만들어 준다. 
+     */
     Tree->Left = NULL;
     Tree->Right = NULL; 
 
@@ -50,6 +52,7 @@ BSTNode*  BST_SearchNode( BSTNode* Tree, ElementType Target )
 
 BSTNode*  BST_SearchMinNode( BSTNode* Tree )
 {
+    /* 방어코드 */
     if ( Tree == NULL )
         return NULL;
 
@@ -59,7 +62,7 @@ BSTNode*  BST_SearchMinNode( BSTNode* Tree )
         return BST_SearchMinNode( Tree->Left );
 }
 
-/* child가 추가할 노드 */
+/* child가 추가할 노드 , Tree는 루트 노드*/
 void BST_InsertNode( BSTNode* Tree, BSTNode *Child)
 {
     if ( Tree->Data < Child->Data ) 
@@ -79,24 +82,27 @@ void BST_InsertNode( BSTNode* Tree, BSTNode *Child)
     }
 }
 
-BSTNode* BST_RemoveNode( BSTNode* Tree,BSTNode* Parent, ElementType Target )
-{
+BSTNode* BST_RemoveNode( BSTNode* Tree, BSTNode* Parent, ElementType Target )
+{   
+    /* return 할 변수 초기화 */
     BSTNode* Removed = NULL;
 
     if ( Tree == NULL )
         return NULL;
-
+    
+    /* 현재 트리의 뿌리 노드에서 부터 시작한다.  */
     if ( Tree->Data > Target )
         Removed = BST_RemoveNode( Tree->Left, Tree, Target );
     else if ( Tree->Data < Target )
         Removed = BST_RemoveNode( Tree->Right, Tree, Target );
-    else //  목표 값을 찾은 경우. 
+    else //  목표 값을 찾은 경우. 삭제한다. 삭제는 2가지 처리가 필요하다. 삭제할 노드를 변수 Removed에 저장, 삭제한 노드의 부모 노드에서 이 노드에 대한 포인터를 NULL로 바꾸기 
     {
         Removed = Tree;
 
-        //  잎 노드인 경우 바로 삭제 
+        //  잎 노드인 경우 바로 삭제
         if ( Tree->Left == NULL && Tree->Right == NULL )
         {
+            // 부모 노드에 대한 포인터를 알아야 삭제할 수 있다. 
             if ( Parent->Left == Tree )
                 Parent->Left = NULL;
             else 
@@ -109,12 +115,12 @@ BSTNode* BST_RemoveNode( BSTNode* Tree,BSTNode* Parent, ElementType Target )
             {
                 //  오른쪽 하위 트리에서 최솟값 노드를 찾아 제거한 뒤 현재의 노드에 위치시킨다. (데이터만 교체)
                 BSTNode* MinNode = BST_SearchMinNode( Tree->Right );
-                MinNode = BST_RemoveNode( Tree, NULL, MinNode->Data ); // 2번째 parameter가 부모Node인데 NULL말고 뭘 넣든 상관없다. 어차피 자식 방향으로 탐색하는 흐름이기 때문이다.
+                MinNode = BST_RemoveNode( Tree->Right, NULL, MinNode->Data ); // 2번째 parameter가 부모Node인데 NULL말고 뭘 넣든 상관없다. 어차피 자식 방향으로 탐색하는 흐름이기 때문이다.
                 Tree->Data = MinNode->Data;
             }
             else
             {
-                //  자식이 한쪽만 있는 경우 
+                //  자식이 한쪽만 있는 경우 삭제하고 그 자식을 부모의 노드의 자식으로
                 BSTNode* Temp = NULL;
                 if ( Tree->Left != NULL )
                     Temp = Tree->Left;

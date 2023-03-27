@@ -2,11 +2,17 @@
 
 Heap* HEAP_Create( int IntitialSize )
 {
+    /* Heap 구조체 만들기 */
     Heap* NewHeap = (Heap*) malloc( sizeof( Heap ) );
+
+    /* 
+    Heap 구조체 초기화
+    Node의 개수 = InitialSize = Capacity 만큼 malloc을 통해서 메모리 할당받는다.
+    배열의 크기를 알고 그 만큼 동적으로 할당받는다. 
+    */
+
     NewHeap->Capacity = IntitialSize;
     NewHeap->UsedSize = 0;
-    /* Node의 개수 = InitialSize = Capacity 만큼 malloc을 통해서 메모리 할당받는다.
-    배열의 크기를 알고 그 만큼 동적으로 할당받는다. */
     NewHeap->Nodes = (HeapNode*) malloc( sizeof ( HeapNode ) * NewHeap->Capacity );
 
     return NewHeap;
@@ -14,16 +20,20 @@ Heap* HEAP_Create( int IntitialSize )
 
 void  HEAP_Destroy( Heap* H )
 {
+    /* 배열 초기화 */
     free( H->Nodes );
+    
+    /* Heap 구조체 초기화 */
     free( H );
 }
 
 void  HEAP_Insert( Heap* H, ElementType NewData )
 {
+    /* Current는 새로 추가할 노드의 인덱스이다. 기존에 Usedsize가 3이라면 배열의 인덱스 3에 추가된다. */
     int CurrentPosition = H->UsedSize;
     int ParentPosition  = HEAP_GetParent( CurrentPosition );
 
-    /* 용량 꽉찰 경우 */
+    /* 용량 찬 상태의 경우 -> CurrentPostion에 넣으려면 확장이 필요하다. */
     if ( H->UsedSize == H->Capacity ) 
     {
         if (H->Capacity == 0)
@@ -35,10 +45,14 @@ void  HEAP_Insert( Heap* H, ElementType NewData )
         H->Nodes = (HeapNode*)realloc( H->Nodes, sizeof( HeapNode ) * H->Capacity );
         printf("용량확장 %d -> %d\n",H->Capacity/2, H->Capacity );
     }
-    /* 꽉 차던 말던 반드시 삽입은 한다. 완전 이진 트리 유지하면서 삽입 */
+    /* 꽉 차던 말던 두 경우 반드시 삽입은 한다. 완전 이진 트리 유지하면서 삽입 */
     H->Nodes[CurrentPosition].Data = NewData;
 
-    /* heap의 속성(부모노드는 자식 노드보다 반드시 작은 값을 가진다.)을 유지하기 위한 후속처리 */ 
+    /* 
+    heap의 속성(부모노드는 자식 노드보다 반드시 작은 값을 가진다.)을 유지하기 위한 후속처리 
+    종료조건 1) CurrentPostion이 0인 경우 즉 Root까지 온 경우
+    종료조건 2) 부모노드 보다 큰 값을 가지는 경우
+    */ 
     while ( CurrentPosition > 0 && H->Nodes[CurrentPosition].Data < H->Nodes[ParentPosition].Data )     
     {
         HEAP_SwapNodes( H, CurrentPosition, ParentPosition );
@@ -68,18 +82,24 @@ void      HEAP_DeleteMin( Heap* H, HeapNode* Root )
     int LeftPosition   = 0;    
     int RightPosition  = 0;    
     
+    /* 1. 루트를 삭제한다. */
     memcpy(Root, &H->Nodes[0], sizeof(HeapNode));
     memset(&H->Nodes[0], 0, sizeof(HeapNode));
 
+    /* 
+    Usedsize를 인덱스로 사용할 것이라 1줄이면 배열의 마지막 인덱스 
+    2. 배열의 마지막 노드를 루트로 복사한다.
+    */
     H->UsedSize--;
     HEAP_SwapNodes( H, 0, H->UsedSize );
 
-    LeftPosition  = HEAP_GetLeftChild(0);
-    RightPosition = HEAP_GetRightChild(0);
+    LeftPosition  = HEAP_GetLeftChild(ParentPosition);
+    RightPosition = HEAP_GetRightChild(ParentPosition);
 
+    /* 3. 힙의 속성을 만족하도록 처리한다. */
     while ( 1 )
     {   
-        /* 1단계: 교환후보 자식을 고르는 과정. 자식 중 최소값을 가지는 자식을 찾는다. */
+        /* 1단계: 자식 중 최소값을 가지는 자식을 찾는다. 교환할 후보를 찾는 과정 */
         int SelectedChild = 0;
 
         /* 아래의 두 경우 모두 마지막 하위 트리에서 벌어지는 상황. 완전 이진 트리를 유지 */
@@ -122,8 +142,7 @@ void      HEAP_DeleteMin( Heap* H, HeapNode* Root )
     if ( H->UsedSize < ( H->Capacity / 2 ) ) 
     {
         H->Capacity /= 2;
-        H->Nodes = 
-            (HeapNode*) realloc( H->Nodes, sizeof( HeapNode ) * H->Capacity );
+        H->Nodes = (HeapNode*) realloc( H->Nodes, sizeof( HeapNode ) * H->Capacity );
     }
 }
 

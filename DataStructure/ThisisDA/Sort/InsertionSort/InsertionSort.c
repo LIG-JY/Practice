@@ -16,7 +16,7 @@ void InsertionSort(int DataSet[], int Length)
  
         value = DataSet[i]; 
 
-        /* 가장 앞 부터 비교(이미 정렬되어있다는 가정) */
+        /* 가장 앞 부터 비교(앞부터 정렬되기 때문에 원하는 위치만 찾으면 된다.) */
         for ( j=0; j<i; j++ )  
         {             
             if (DataSet[j] > value)  
