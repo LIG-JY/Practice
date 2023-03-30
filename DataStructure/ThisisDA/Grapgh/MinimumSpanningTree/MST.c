@@ -22,43 +22,54 @@ void Prim(Graph* G, Vertex* StartVertex, Graph* MST )
         Vertex* NewVertex = CreateVertex( CurrentVertex->Data );
         AddVertex( MST, NewVertex);
 
+        /* 배열 초기화 용도 */
         Fringes[i]     = NULL;
         Precedences[i] = NULL;
         MSTVertices[i] = NewVertex;        
-        Weights[i]     = MAX_WEIGHT;        
-        CurrentVertex  = CurrentVertex->Next;
+        Weights[i]     = MAX_WEIGHT;
         i++;
+
+        CurrentVertex  = CurrentVertex->Next;
     }
     /* StartNode는 입력값으로 정해지는 노드이다. Addvertex 순서와 무관하다. */
+    // 1. 임의의 정점을 최소 신장 트리에 추가
     PQ_Enqueue ( PQ, StartNode );
 
     /* Index는 AddVertex를 보면 그래프에 속한 Vertex수와 정비례한다. 추가되는 순서가 곧 Index이다. */
     Weights[StartVertex->Index] = 0;
     
-    while( ! PQ_IsEmpty( PQ ) )
+    // 2. 우선 순위큐에 노드를 삽입과 제거 반복
+    while(! PQ_IsEmpty(PQ))
     {
         PQNode  Popped;
         
-        /* Popped 변수에 PriorityQueue에서 뽑아낸 노드를 저장한다. (최우선순위) */
+        /* Popped 변수에 PriorityQueue에서 뽑아낸 노드를 저장한다. 
+           현재 PQ에서 가장 가중치가 낮은 Edge를 뽑는다. */
         PQ_Dequeue(PQ, &Popped);
         /* PQNode의 데이터는 Vertex의 포인터이다. */
         CurrentVertex = (Vertex*)Popped.Data;
         
-        /* Fringes를 왜 사용할까? -> 사이클 형성되는 경우 확인하려고? or 중복 확인? */
+        /* Fringes를 왜 사용할까? -> MST에서 중복이 있으면 안 되기 때문에 확인용 */
         Fringes[CurrentVertex->Index] = CurrentVertex;
 
-        /* PriorityQueue에서 뽑은 Vertex의 인접 Edge를 순회해서 가중치가 작은 Edge를 찾는 작업 */
+        // 3. 각 PriorityQueue에서 뽑은 Vertex(Node)의 인접 Edge를 순회해서 가중치가 작은 Edge를 찾는 작업
         CurrentEdge = CurrentVertex->AdjacencyList;
         while ( CurrentEdge != NULL )
         {            
             Vertex* TargetVertex = CurrentEdge->Target;
             /* Fringes 확인하고 */ 
             if ( Fringes[TargetVertex->Index] == NULL &&
-                 CurrentEdge->Weight < Weights[TargetVertex->Index] )
+                 CurrentEdge->Weight < Weights[TargetVertex->Index] ) 
+                 // Weights 초기화는 MAX_WEIGHT라 처음은 무조건 만족하게 되어있다.
+                 // 2번째 조건 때문에 Cycle을 방지할 수 있다. 같은 Vertex를 가리키는 Edge중 가중치가 작은 Edge 하나만 택하니까!
+                 // adjacement edge를 모두 순회하면서 PQ에 넣는다.
             {
+                // 우선 순위 큐에 넣을 노드 만들기, 가중치가 우선 순위가 된다.
                 PQNode NewNode =  { CurrentEdge->Weight, TargetVertex };
+                // 우선 순위 큐에 넣기
                 PQ_Enqueue ( PQ, NewNode );
 
+                // 최소 신장 트리 완성하기 위해서 From vertex와 가중치를 기록하는 배열
                 Precedences[TargetVertex->Index] = CurrentEdge->From;
                 Weights[TargetVertex->Index]     = CurrentEdge->Weight;                
             }
@@ -67,6 +78,7 @@ void Prim(Graph* G, Vertex* StartVertex, Graph* MST )
         }
     }
 
+    // 새로 Graphg 구축
     for ( i=0; i<G->VertexCount; i++ )
     {
         int FromIndex, ToIndex;
