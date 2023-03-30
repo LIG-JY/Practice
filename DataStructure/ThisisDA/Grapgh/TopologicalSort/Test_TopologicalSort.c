@@ -20,14 +20,23 @@ int main( void )
     Vertex* G = CreateVertex( 'G' );
     Vertex* H = CreateVertex( 'H' );
     
-    //  그래프에 정점을 추가 
+    //  그래프에 정점을 추가
+    // AddVertex( graph, A );
+    // AddVertex( graph, B );
+    // AddVertex( graph, C );
+    // AddVertex( graph, D );
+    // AddVertex( graph, E );
+    // AddVertex( graph, F );
+    // AddVertex( graph, G );
+    // AddVertex( graph, H );
+    // 삽입 순서 바꿔보기
     AddVertex( graph, A );
-    AddVertex( graph, B );
     AddVertex( graph, C );
+    AddVertex( graph, B );
+    AddVertex( graph, G );
     AddVertex( graph, D );
     AddVertex( graph, E );
     AddVertex( graph, F );
-    AddVertex( graph, G );
     AddVertex( graph, H );
 
     //  정점과 정점을 간선으로 잇기 
@@ -47,6 +56,8 @@ int main( void )
     AddEdge( F, CreateEdge( F, H, 0 ) );
     
     AddEdge( G, CreateEdge( G, H, 0 ) );
+
+    PrintGraph(graph);
 
     //  위상 정렬 
     TopologicalSort( graph->Vertices, &SortedList );
