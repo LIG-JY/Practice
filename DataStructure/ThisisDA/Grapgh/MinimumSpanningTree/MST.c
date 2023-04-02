@@ -109,25 +109,46 @@ void Kruskal(Graph* G, Graph* MST )
     int           i;
     Vertex*       CurrentVertex = NULL;
     Vertex**      MSTVertices   = (Vertex**) malloc( sizeof(Vertex*) * G->VertexCount );
-    DisjointSet** VertexSet     = 
-                         (DisjointSet**)malloc( sizeof(DisjointSet*) * G->VertexCount );
-    
+    DisjointSet** VertexSet     = (DisjointSet**)malloc( sizeof(DisjointSet*) * G->VertexCount );
+                         
     PriorityQueue* PQ      = PQ_Create(10);
 
-    i = 0;    
+    i = 0;
+    // 입력받은 G(그래프) 구조체의 Vertices 연결리스트 순서대로 순회를 하게 된다.
     CurrentVertex = G->Vertices;
     while ( CurrentVertex != NULL )
     {
         Edge* CurrentEdge;
 
-        VertexSet[i]   = DS_MakeSet( CurrentVertex );
+        
+        /* 
+        1. DisjointSet 확인용 집합의 배열
+        G 구조체의 Vertices 연결리스트의 순서와 Vertexset vertex포인터의 배열의 순서가 동일하다.
+        MakeSet으로 동적할당하기 때문에 free가 필요하다. 
+        */
+        VertexSet[i]   = DS_MakeSet( CurrentVertex ); 
+        /* 
+        2. 최소신장트리를 만들기 위해서 Vertex의 값만 복사해서 새로운 Vertex객체로 배열을 만든다. 
+        vertex 포인터의 배열을 통해서 각 vertex에서 최소 신장 트리를 만족하는 edge만 연결하기 위함
+        vertex 구조체는 인접 edge배열을 연결리스트 형태로 가지고 있다.
+        */
         MSTVertices[i] = CreateVertex( CurrentVertex->Data );
+        /* 
+        3. input으로 받은 MST(graph 포인터)에 Vertices배열 만들기(모든 Vertex 포함)
+        그래프구조체는 Vertices 배열을 연결리스트로 가지고 있다. 
+        */
         AddVertex( MST, MSTVertices[i] );
 
+        // CurrentVertex에서 인접 Edge모두 순회하면서 PQ에 삽입하는 과정
         CurrentEdge = CurrentVertex->AdjacencyList;
         while ( CurrentEdge != NULL )
         {
             PQNode NewNode = { CurrentEdge->Weight, CurrentEdge };
+            // 중복으로 edge가 들어가는지 debug, 우선 순위 큐에는 중복으로 들어가는 것이 확인되었다.
+            printf("enqueue! %c - %c : %d\n", 
+            CurrentEdge->From->Data, 
+            CurrentEdge->Target->Data, 
+            CurrentEdge->Weight );
             PQ_Enqueue( PQ, NewNode );
 
             CurrentEdge = CurrentEdge->Next;
@@ -144,6 +165,7 @@ void Kruskal(Graph* G, Graph* MST )
         int    ToIndex;
         PQNode Popped;
 
+        // PQ에서 가중치 최소값을 가지는 edge를 뽑는다.
         PQ_Dequeue( PQ, &Popped );
         CurrentEdge = (Edge*)Popped.Data;
 
@@ -152,21 +174,43 @@ void Kruskal(Graph* G, Graph* MST )
             CurrentEdge->Target->Data, 
             CurrentEdge->Weight );
 
+        // 입력받은 G에 addVertex를 하면서 각 Vertex의 index값을 활용한다.
         FromIndex = CurrentEdge->From->Index;
         ToIndex   = CurrentEdge->Target->Index;
 
+        /* 
+        입력받은 G의 Vertex리스트의 index에 해당하는 vertex와, Vertexset의 index의 해당하는 vertex가 동일함을 이용한다.
+
+        예를들어 CurrentEdge의 From Vertex의 값이 A, to Vertex의 값이 B이면
+        G 구조체와 Addvertex 결과 A값을 갖는 Vertex, B값을 갖는 Vertex의 index를
+        VertexSet에 넣으면 A값을 갖는 vertex, B값을 갖는 vertex가 나온다. 
+
+        물론 G 구조체의 Vertex 구조체와 VertexSet에서 나오는 vertex구조체는 다른 구조체다.
+        달라야 하는 이유는 Vertexset으로 얻어낸 새로운 Vertex에 오직 하나의 Edge만 Add해서 최소신장 트리를 완성해야하기 때문이다.
+
+        각 Vertex가 같은 집합인지 확인한다. 우선 순위 큐에 A,B를 연결하는 Edge와 B,A를 연결하는 Edge가 중복될 것같지만 상관없다.
+        A값을 가지는 Vertex와 B값을 가지는 Vertex가 Union set이 되기 때문에 A,B를 연결하는 Edge(CurrentEdge)를 처리하는 과정 후에
+        B,A를 연결하는 CurrentEdge를 처리할 때 조건문에서 탈락한다.
+        */
         if ( DS_FindSet( VertexSet[FromIndex] ) != DS_FindSet( VertexSet[ToIndex] ) )
         {
+            /* 
+            값 A를 갖는 Vertex에 하나의 Edge를 추가.
+            Vertex 구조체의 인접Edge 연결리스트에 최소 가중치의 Edge만 남게된다. 
+            */
             AddEdge( MSTVertices[FromIndex], 
                      CreateEdge( MSTVertices[FromIndex], 
                                  MSTVertices[ToIndex], 
                                  CurrentEdge->Weight ) );
-
+            /* 
+            값 B를 갖는 Vertex에 하나의 Edge를 추가.
+            Vertex 구조체의 인접Edge 연결리스트에 최소 가중치의 Edge만 남게된다. 
+            */
             AddEdge( MSTVertices[ToIndex], 
                      CreateEdge( MSTVertices[ToIndex], 
                                  MSTVertices[FromIndex], 
                                  CurrentEdge->Weight ) );
-
+            // 두 Vertex를 같은 집합으로 만든다.
             DS_UnionSet( VertexSet[FromIndex], VertexSet[ToIndex] );
         }
     }
