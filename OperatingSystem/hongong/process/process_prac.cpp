@@ -10,11 +10,8 @@ void bar() {
   printf("execute bar\n");
 }
 
-
 int main()
 {
-	int process_count = 0;
-
     printf("hello, os\n");
 	printf("my pid is %d\n", getpid());
 
