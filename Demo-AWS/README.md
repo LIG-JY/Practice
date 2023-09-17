@@ -221,12 +221,6 @@ public class Client {
     }
 }
 ```
-
-
-## UML
-![uml_ss](https://github.com/LIG-JY/PDA-JavaPattern/assets/104045973/df6cda99-35e1-474b-a299-f72c97f37d9c)
-
-
 ## 커밋 메시지 규칙
 
 다음의 규칙에 따라 커밋 메시지를 작성해주세요. 이 규칙은 프로젝트의 일관성을 유지하고, 변동사항을 쉽게 파악하기 위한 목적을 갖고 있습니다.
