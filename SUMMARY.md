@@ -9,3 +9,4 @@
 ## POCU
 
 - [COMP 1500](./docs/POCU/COMP1500/README.md)
+  - [week1](./docs/POCU/COMP1500/docs/week1.md)
