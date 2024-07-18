@@ -1,3 +1,0 @@
-* 문자열탐색 
-1. BruteForce 구현,Test.c 파일입출력 복습 필요
-2. KarpRabin 구현, Test.c 파일입출력 복습
