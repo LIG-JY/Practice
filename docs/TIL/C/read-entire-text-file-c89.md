@@ -72,18 +72,18 @@ int main() {
 - n: 한 번에 읽어온 바이트 수
 
 - case1: 버퍼 사이즈 > 파일의 크기
-  - while문 1번만 실행
-  - n == 파일의 크기
-  - 두번째 while의 조건문에서 fread 결과값이 0이므로 while문 종료
+    - while문 1번만 실행
+    - n == 파일의 크기
+    - 두번째 while의 조건문에서 fread 결과값이 0이므로 while문 종료
 - case2: 버퍼 사이즈 < 파일의 크기
-  - while문 여러번 실행
-  - n == bufferSize
-  - length == bufferSize를 만족함. 따라서 realloc으로 버퍼 사이즈 증가
-  - 두번째 while의 조건문에서 fread는 bufferSize - length만큼 읽어옴
-    - bufferSize == length + (늘어난 버퍼 사이즈)
-    - 즉 늘어난 버퍼 사이즈 만큼 추가로 파일을 읽음
-    - ... 반복, 반복하다가 case1이 될 가능성이 높음
-  - 파일을 모두 읽은 경우 fread는 0을 반환하므로 while문 종료
+    - while문 여러번 실행
+    - n == bufferSize
+    - length == bufferSize를 만족함. 따라서 realloc으로 버퍼 사이즈 증가
+    - 두번째 while의 조건문에서 fread는 bufferSize - length만큼 읽어옴
+        - bufferSize == length + (늘어난 버퍼 사이즈)
+        - 즉 늘어난 버퍼 사이즈 만큼 추가로 파일을 읽음
+        - ... 반복, 반복하다가 case1이 될 가능성이 높음
+    - 파일을 모두 읽은 경우 fread는 0을 반환하므로 while문 종료
 
 ## 2. fseek와 ftell을 이용하는 방법
 
@@ -143,5 +143,5 @@ int main(int argc, char** argv)
 - fseek(fp, 0, SEEK_END): 파일의 끝으로 이동
 - lSize = ftell(fp): SEEK_SET에서 부터 파일의 끝까지의 바이트 수를 반환하므로 크기를 알 수 있음
 - rewind(fp): 파일의 처음으로 이동
-  - fseek(fp, 0, SEEK_SET)과 동일
+    - fseek(fp, 0, SEEK_SET)과 동일
 - 파일의 크기를 동적으로 알아내면, 그 크기만큼 동적할당을 해주고 fread로 파일을 읽어옴
