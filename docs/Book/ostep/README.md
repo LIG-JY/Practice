@@ -1,5 +1,7 @@
 # OSTEP
 
+- [NOTE](./note)
+
 - [HOMEWORKS](./homework)
 
 - [PROJECTS]()
