@@ -34,11 +34,13 @@ npx expo install @sentry/react-native
 
 - Expo CLI를 통해 환경변수 설정
     - [docs](https://docs.expo.dev/guides/environment-variables/)
+    - 또는 expo 웹페이지에서 project/configuration/Environment-variables >> 여기서 등록 및 수정 가능
 
 ```shell
 eas secret:create --name SENTRY_DSN --value "<your-dsn>"
 eas secret:create --name SENTRY_AUTH_TOKEN --value "<your-auth-token>"
 ```
+
 
 - SENTRY_DSN 환경변수는 App.tsx 에서 sentry 환경설정 할 때 사용됨
 
@@ -49,18 +51,17 @@ eas secret:create --name SENTRY_AUTH_TOKEN --value "<your-auth-token>"
 
 ```javascript
 {
-    "expo"
-:
-    {
-        "plugins"
-    :
-        [
+    "expo": {
+        "plugins": [
             [
-                "@sentry/react-native/expo", // Sentry Expo Plugin 추가
+                "@sentry/react-native/expo",
+                // Sentry Expo Plugin 추가
                 {
                     url: "https://sentry.io/",
-                    organization: "g2s", // Sentry의 organization 이름
-                    project: "EVA-Checker", // Sentry의 project 이름
+                    organization: "g2s",
+                    // Sentry의 organization 이름
+                    project: "EVA-Checker",
+                    // Sentry의 project 이름
                     authToken: process.env.SENTRY_AUTH_TOKEN // 환경 변수로 인증 토큰 제공
                 }
             ]
@@ -105,13 +106,13 @@ module.exports = config;
 
 - [문서](https://docs.expo.dev/versions/latest/config/app/#extra)를
   참고하면 [Expo Constants API](https://docs.expo.dev/versions/latest/sdk/constants/#constantsmanifest) 사용을 권함
-  - `__DEV__` 와 같은 플래그 사용해 코드에서 환경을 구분하는 방법도 있음
+    - `__DEV__` 와 같은 플래그 사용해 코드에서 환경을 구분하는 방법도 있음
 
 > Any extra fields you want to pass to your experience. Values are accessible via `Constants.expoConfig.extra`
 
 - eas.json 파일에서 환경에 따라 환경 변수 설정
 - 빌드 시점에 환경 변수를 등록함
-  - `process.env.ENV` 로 사용할 수 있음
+    - `process.env.ENV` 로 사용할 수 있음
 
 ```json
 {
