@@ -1,59 +1,5 @@
 # AWS INFRA
 
-## IAM Role EC2에 부여하기
-
-- 역할 생성
-- 신뢰할 수 있는 엔터티 선택
-    - 신뢰할 수 있는 엔터티 유형:
-        - AWS 서비스
-        - EC2
-    - 권한추가:
-        - AmazonEC2ContainerRegistryFullAccess
-
-- 배포할 EC2에 역할 추가
-    - EC2 콘솔
-        - 작업
-        - 보안
-        - IAM 역할 수정
-
-- 역할을 부여해도 ecr에서 도커이미지를 다운 받는데 credential issue 발생하면 그냥 직접 로그인하는 명령어를 github action workflow 포함하기
-
-## IAM 사용자
-
-- 배포할 때 AWS credentials를 구성해야하기 때문에 생성
-
-- 사용자 이름:
-    - admin
-- AWS Management Console에 대한 사용자 액세스 권한 제공 – 선택 사항:
-    - 미선택
-    - IAM 계정으로 브라우저에서 AWS Management Console에 접속할 일 없음
-    - 루트계정만 AWS Management Console 이용
-    - 이 IAM 계정은 프로그래밍 방식, CLI에서만 사용
-
-- 권한설정:
-    - AmazonEC2ContainerRegistryFullAccess
-    - ECR 관련 작업만 수행함
-
-- 액세스 키 생성
-    - ECR에 푸시,풀 하려면 필요함
-    - Github Repository에서 secret으로 관리
-
-## ECR Container Hub
-
-- 리포토리 이름:
-    - safety-and-self-check-frontend/prod
-    - safety-and-self-check-<역할>/<프로필>
-- 이미지 태그 변경 가능성:
-    - Mutable
-        - CI/CD로 최신 빌드 이미지를 배포하는 경우라면 Mutable이 편리
-        - 이미지 버전별 관리하려면 Immutable도 고려
-- 암호화 구성:
-    - AES-256
-        - AWS KMS는 비용도 들고, 굳이?
-
-- 리전:
-    - ap-northeast-2
-
 ## 네트워크
 
 ### VPC
@@ -484,3 +430,51 @@ Serving HTTP on 0.0.0.0 port 8080 (http://0.0.0.0:8080/) ...
 - 규칙 우선 순위 설정:
     - 지금 생성한 경로 규칙이 우선순위가 높게 설정
     - 따라서 api 호출은 백엔드 대상 그룹으로 라우팅, 나머지 요청은 프론트 대상 그룹으로 라우팅
+
+## IAM 사용자
+
+- 배포할 때 AWS credentials를 구성해야하기 때문에 생성
+    - ECR에 이미지 push 및 pull 하기 위함
+
+- 사용자 이름:
+    - admin
+- AWS Management Console에 대한 사용자 액세스 권한 제공 – 선택 사항:
+    - 미선택
+    - IAM 계정으로 브라우저에서 AWS Management Console에 접속할 일 없음
+    - 루트계정만 AWS Management Console 이용
+    - 이 IAM 계정은 프로그래밍 방식, CLI에서만 사용
+
+- 권한설정:
+    - 직접 정책 연결
+        - AmazonEC2ContainerRegistryFullAccess
+        - ECR 관련 작업만 수행함
+
+- 액세스 키 생성
+    - 액세스 키 모범 사례 및 대안:
+        - Command Line Interface(CLI)
+    - 설명 태그 설명:
+        - 생략
+- AWS credentials를 구성 시 인증하기 위함
+- Github Repository에서 secret variable로 관리
+
+## ECR Container Hub
+
+- Amazon ECR / 프라이빗 레지스트리 / 리포지토리 /리포지토리 생성
+
+- 리전:
+    - ap-northeast-2
+
+- 일반 설정
+    - 리포지토리 이름:
+        - eva-checker-<역할>/<프로필>
+        - Ex) eva-checker-backend/prod
+    - 이미지 태그 변경 가능성:
+        - Mutable
+            - CI/CD로 최신 빌드 이미지를 배포하는 경우라면 Mutable이 편리
+                - overwrite 할 거야
+            - 이미지 버전별 관리하려면 Immutable 설정 후 버젼 별로 이미지 관리하는 것도 괜찮음
+
+- 암호화 설정
+    - 암호화 구성:
+        - AES-256
+            - AWS KMS는 비용도 들고, 굳이?
